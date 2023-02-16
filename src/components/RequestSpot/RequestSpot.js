@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import { COLORS } from "../../color/Color";
 import ListSpot from "../ListSpot/ListSpot";
 import * as Animatable from "react-native-animatable";
+import { useGetUserSpotRequestQuery } from "../../features/user/userApiSlice";
+import Loading from "../../pages/Loading/Loading";
 const RequestSpot = ({ navigation }) => {
   const ListFunding = [
     {
@@ -41,19 +43,25 @@ const RequestSpot = ({ navigation }) => {
       status: "Pending",
     },
   ];
+  const { data } = useGetUserSpotRequestQuery();
+  if (!data) return <Loading />;
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
       <FlatList
         keyExtractor={(item) => item.id}
-        data={ListFunding}
+        data={data.request}
         renderItem={({ item }) => (
           <Animatable.View animation="slideInDown" duration={1000} delay={300}>
             <ListSpot
-              id={item.id}
-              name={item.name}
+              key={item._id}
+              name={item.recieverAddress}
+              crypto={item.firstUnit}
+              fiat={item.secondUnit}
               amount={item.amount}
-              currency={item.currency}
+              total={item.total}
+              creditCard={item.senderAddress}
               status={item.status}
+              date={item.date}
               onPress={() => {
                 alert("hihi");
               }}

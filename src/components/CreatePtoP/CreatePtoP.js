@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
@@ -14,12 +16,17 @@ import { SelectList } from "react-native-dropdown-select-list";
 import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
 import { useGetUserWalletQuery } from "../../features/user/userApiSlice";
 import { COLORS } from "../../color/Color";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import useAuth from "../../hooks/useAuth";
+import { Toast } from "react-native-toast-message/lib/src/Toast";
 const CreatePtoP = ({ navigation }) => {
-  const route = useRoute();
-  const method = ["Buy", "Sell"];
-  const [currencyID, setCurrencyID] = useState("USD");
+  const method = [
+    { key: "buy", value: "Buy" },
+    { key: "sell", value: "Sell" },
+  ];
+  const [currencyID, setCurrencyID] = useState("usd");
   const [amount, setAmount] = useState(null);
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState(0);
   const [methodSelected, setMethodSelected] = useState("Buy");
   const [selectedCrypto, setSelectedCrypto] = useState("bitcoin");
   const [lowRate, setLowRate] = useState([]);
@@ -29,7 +36,7 @@ const CreatePtoP = ({ navigation }) => {
 
   useEffect(() => {
     axios
-      .get(`https://api.coingecko.com/api/v3/coins/${currencyID}`)
+      .get(`https://api.coingecko.com/api/v3/coins/${selectedCrypto}`)
       .then((response) => {
         setLowRate(response.data.market_data.low_24h);
         setHighRate(response.data.market_data.high_24h);
@@ -37,7 +44,7 @@ const CreatePtoP = ({ navigation }) => {
       .catch((error) => {
         console.log(error);
       });
-  }, [currencyID]);
+  }, [selectedCrypto]);
 
   const assets = [
     { key: "tether", value: "Tether" },
@@ -52,8 +59,54 @@ const CreatePtoP = ({ navigation }) => {
     { key: "dogecoin", value: "Dogecoin" },
   ];
 
-  const handleSubmit = () => {
-    alert("Your transaction is being checked");
+  const handleSubmit = async () => {
+    console.log("hello");
+    const token = await AsyncStorage.getItem("token");
+    const opts = {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : "",
+      },
+    };
+    // if (price > highRate[currencyID] || price < lowRate[currencyID]) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Please pre-check your price",
+    //   });
+    //   return;
+    // }
+    //  else if (amount <= 0) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: "Please pre-check your amount",
+    //   });
+    //   return;
+    // }
+    axios
+      .post(
+        `http://172.16.1.27:5000/api/user/request-p2p/create`,
+        {
+          type: methodSelected,
+          firstUnit: selectedCrypto,
+          secondUnit: currencyID,
+          total: price * amount,
+          amount: amount,
+        },
+        opts
+      )
+      .then((response) => {
+        Toast.show({
+          type: "success",
+          text1: response.data.message,
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        Toast.show({
+          type: "error",
+          text1: error.response.data.message,
+        });
+      });
+    console.log("hel1lo");
   };
   if (!data) return null;
   function isFiat(value) {
@@ -68,64 +121,23 @@ const CreatePtoP = ({ navigation }) => {
       value: item.currencyID,
     });
   });
-
-  const CryptocurrenciesView = () => {
-    return assets.map((e, index) => {
-      return (
-        <TouchableOpacity
-          key={index}
-          style={{
-            margin: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor:
-              selectedCrypto === e.value ? COLORS.yellow1 : "white",
-          }}
-          onPress={() => {
-            setSelectedCrypto(e.id);
-          }}
-        >
-          <CryptoSymbol ids={e.id} />
-          <Text>{e.name}</Text>
-        </TouchableOpacity>
-      );
-    });
-  };
-
-  const FiatcurrenciesView = () => {
-    return fiatList.map((e, index) => {
-      return (
-        <TouchableOpacity
-          key={index}
-          style={{
-            margin: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor:
-              selectedCrypto === e.currencyID ? COLORS.yellow1 : "white",
-          }}
-          onPress={() => {
-            setCurrencyID(e.id);
-          }}
-        >
-          <Text>{e.currencyID}</Text>
-        </TouchableOpacity>
-      );
-    });
-  };
-
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: "black" }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Create transaction</Text>
       </View>
       <View style={styles.main}>
         <ScrollView style={{ backgroundColor: "white" }}>
           <View style={{ padding: 20 }}>
-            <Text style={styles.form_label_text}>Select your currency</Text>
+            <Text style={styles.form_label_text}>
+              Select your crypto currency
+            </Text>
             <View style={styles.form_group1}>
               <SelectList
-                setSelected={(val) => setMethodSelected(val)}
+                setSelected={(val) => setSelectedCrypto(val)}
                 data={assets}
                 search={false}
                 dropdownStyles={{ maxHeight: 150 }}
@@ -136,31 +148,12 @@ const CreatePtoP = ({ navigation }) => {
             </Text>
             <View style={styles.form_group1}>
               <SelectList
-                setSelected={(val) => setMethodSelected(val)}
+                setSelected={(val) => setCurrencyID(val)}
                 data={newList}
                 search={false}
                 dropdownStyles={{ maxHeight: 150 }}
               />
             </View>
-            <Text style={styles.form_label_text}>
-              Select your crypto currency
-            </Text>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              showsHorizontalScrollIndicator
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-
-                  paddingVertical: 10,
-                }}
-              >
-                {CryptocurrenciesView()}
-              </View>
-            </ScrollView>
             <Text style={styles.form_label_text}>Select your method</Text>
             <View style={styles.form_group1}>
               <SelectList
@@ -170,16 +163,6 @@ const CreatePtoP = ({ navigation }) => {
                 dropdownStyles={{ maxHeight: 150 }}
               />
             </View>
-
-            {/* <Text style={styles.form_label_text}>Enter your name</Text>
-            <View style={styles.form_group}>
-              <TextInput
-                placeholder="Enter your name"
-                onChangeText={(newText) => setName(newText)}
-                defaultValue={name}
-                style={styles.form_input}
-              />
-            </View> */}
             <Text style={styles.form_label_text}>Enter your price</Text>
             <View style={styles.form_group}>
               <TextInput
@@ -187,7 +170,14 @@ const CreatePtoP = ({ navigation }) => {
                 onChangeText={(newText) => setPrice(newText)}
                 defaultValue={price}
                 style={styles.form_input}
+                keyboardType="numeric"
               />
+            </View>
+            <View>
+              <Text style={styles.amount_avl}>
+                Must higher than {lowRate[currencyID]} - lower than{" "}
+                {highRate[currencyID]}
+              </Text>
             </View>
             <Text style={styles.form_label_text}>Enter your amount</Text>
             <View style={styles.form_group}>
@@ -196,9 +186,12 @@ const CreatePtoP = ({ navigation }) => {
                 onChangeText={(newText) => setAmount(newText)}
                 defaultValue={amount}
                 style={styles.form_input}
+                keyboardType="numeric"
               />
             </View>
-
+            <Text style={styles.form_label_text}>
+              Total: {price * amount} {currencyID}
+            </Text>
             <View style={styles.button}>
               <TouchableOpacity
                 style={{
@@ -216,7 +209,7 @@ const CreatePtoP = ({ navigation }) => {
           </View>
         </ScrollView>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -272,5 +265,10 @@ const styles = StyleSheet.create({
     marginTop: 0,
     paddingLeft: 10,
     color: "#05375a",
+  },
+  amount_avl: {
+    padding: 10,
+    textAlign: "center",
+    color: "red",
   },
 });

@@ -55,7 +55,7 @@ const Home = ({ navigation }) => {
       },
     };
     axios
-      .get("http://192.168.1.2:5000/api/user/user-info/review", opts)
+      .get("http://192.168.7.59:5000/api/user/user-info/review", opts)
       .then((response) => {
         // console.log(response.data.user.fullname);
       })

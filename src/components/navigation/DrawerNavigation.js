@@ -26,7 +26,6 @@ import useAuth from "../../hooks/useAuth";
 import { useGetUserQuery } from "../../features/user/userApiSlice";
 import Loading from "../../pages/Loading/Loading";
 import AdminPage from "../../pages/AdminPage/AdminPage";
-// import UserInformation from "../../pages/UserInformation/UserInformation";
 import bao from "../../images/coin2.png";
 import { useState } from "react";
 import Transactions from "../Transactions/Transactions";
@@ -36,14 +35,12 @@ import Derivatives from "../Exchanges/Derivatives";
 import { useSendLogoutMutation } from "../../features/auth/authApiSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
+import RNRestart from "react-native-restart";
 
 const Drawer = createDrawerNavigator();
 const User = () => {
-  // const { email } = useAuth();
-  // if (!email) return null;
   const { data } = useGetUserQuery();
-  // if (!data) return <Loading />;
-  // console.log(data);
+
   return (
     <View
       style={{
@@ -88,12 +85,11 @@ const CustomDrawer = (props) => {
   const navigation = useNavigation();
   const { data } = useGetUserQuery();
   const [sendLogout] = useSendLogoutMutation();
-  // if (!data) return <Loading />;
+
   const handleLogout = async () => {
-    console.log("hello");
-    console.log(await AsyncStorage.getItem("token"));
     await AsyncStorage.removeItem("token");
     await sendLogout;
+    // RNRestart.Restart();
     navigation.navigate("Market");
   };
   return (
@@ -156,6 +152,26 @@ const DrawerNavigation = () => {
         </>
       ) : (
         <>
+          <Drawer.Screen
+            options={{ headerShown: false }}
+            name="DBCoin"
+            component={Tabs}
+          />
+          <Drawer.Screen
+            options={{ headerShown: false }}
+            name="Transactions"
+            component={Transactions}
+          />
+          <Drawer.Screen
+            options={{ headerShown: false }}
+            name="Exchanges"
+            component={Exchanges}
+          />
+          <Drawer.Screen
+            options={{ headerShown: false }}
+            name="Derivatives"
+            component={Derivatives}
+          />
           {data.user.role === "admin" ? (
             <>
               <Drawer.Screen
@@ -174,26 +190,6 @@ const DrawerNavigation = () => {
           )}
         </>
       )}
-      <Drawer.Screen
-        options={{ headerShown: false }}
-        name="DBCoin"
-        component={Tabs}
-      />
-      <Drawer.Screen
-        options={{ headerShown: false }}
-        name="Transactions"
-        component={Transactions}
-      />
-      <Drawer.Screen
-        options={{ headerShown: false }}
-        name="Exchanges"
-        component={Exchanges}
-      />
-      <Drawer.Screen
-        options={{ headerShown: false }}
-        name="Derivatives"
-        component={Derivatives}
-      />
     </Drawer.Navigator>
   );
 };

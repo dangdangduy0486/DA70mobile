@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { COLORS } from "../../color/Color";
-const ListSpot = ({ id, name, amount, currency, status }) => {
+import moment from "moment/moment";
+import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
+
+const ListSpot = ({ id, name, amount, total, crypto, fiat, status, date }) => {
   const [newStatus, setNewStatus] = useState(status);
   const [approve, setApprove] = useState("");
   const [reject, setReject] = useState("");
@@ -14,9 +17,13 @@ const ListSpot = ({ id, name, amount, currency, status }) => {
             <Text style={{ color: "white" }}>{id}</Text>
           </View>
           <View style={styles.titleWrapper}>
-            <Text style={styles.text}>Name : {name}</Text>
+            {/* <Text style={styles.text}>Name : {name}</Text> */}
+            <CryptoSymbol ids={crypto} />
             <Text style={styles.text}>Amount : {amount}</Text>
-            <Text style={styles.text}>Currency : {currency}</Text>
+            <Text style={styles.text}>
+              Total: {total} {fiat}
+            </Text>
+            <Text style={styles.text}>Date : {moment(date).fromNow()}</Text>
           </View>
         </View>
         {/* center */}

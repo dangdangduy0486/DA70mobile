@@ -1,19 +1,39 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { COLORS } from "../../color/Color";
+import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
+import moment from "moment/moment";
 
-const ListSell = ({ name, currency, amount, date, onPress, price }) => {
+const ListSell = ({
+  sender,
+  fiat,
+  crypto,
+  total,
+  amount,
+  date,
+  onPress,
+  price,
+}) => {
   return (
     <View>
       <View style={styles.coinWrapper}>
         {/* left */}
         <View style={styles.left}>
           <View style={styles.titleWrapper}>
-            <Text style={styles.title}>{name}</Text>
-            <Text style={styles.text}>Price : {price}</Text>
-            <Text style={styles.text}>Currency : {currency}</Text>
-            <Text style={styles.text}>Amount : {amount}</Text>
-            <Text style={styles.text}>{date}</Text>
+            <View style={styles.titleWrapper}>
+              <CryptoSymbol ids={crypto} />
+              <Text style={styles.text}>
+                Sender:
+                {sender.length < 35
+                  ? `${sender}`
+                  : `${sender.substring(0, 25)}...`}
+              </Text>
+              <Text style={styles.text}>Amount : {amount}</Text>
+              <Text style={styles.text}>
+                Total :{total} {fiat}
+              </Text>
+              <Text style={styles.text}>Date: {moment(date).fromNow()}</Text>
+            </View>
           </View>
         </View>
         {/* right */}

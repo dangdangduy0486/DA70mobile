@@ -1,7 +1,10 @@
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { COLORS } from "../../color/Color";
-const ListFunding = ({ name, currency, amount, creditCard, status }) => {
+import moment from "moment/moment";
+import formatCurrency from "react-native-format-currency";
+
+const ListFunding = ({ name, currency, amount, creditCard, status, date }) => {
   const [newStatus, setNewStatus] = useState(status);
   const [approve, setApprove] = useState("");
   const [reject, setReject] = useState("");
@@ -14,10 +17,14 @@ const ListFunding = ({ name, currency, amount, creditCard, status }) => {
             {/* <Text style={{ color: "white" }}>{id}</Text> */}
           </View>
           <View style={styles.titleWrapper}>
-            <Text style={styles.text}>Name : {name}</Text>
+            <Text style={styles.text}>
+              Name:
+              {name.length < 35 ? `${name}` : `${name.substring(0, 25)}...`}
+            </Text>
             <Text style={styles.text}>Currency : {currency}</Text>
             <Text style={styles.text}>Amount : {amount}</Text>
             <Text style={styles.text}>Card : {creditCard}</Text>
+            <Text style={styles.text}>Date : {moment(date).fromNow()}</Text>
           </View>
         </View>
         {/* center */}

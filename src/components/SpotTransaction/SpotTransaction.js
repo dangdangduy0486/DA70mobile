@@ -47,7 +47,7 @@ const Spot = ({ navigation }) => {
   };
   const handleSubmit = async () => {
     const { email } = await useAuth();
-    const url = `http://192.168.1.6:5000/api/user/request/create/spot`;
+    const url = `http://172.16.1.27:5000/api/user/request/create/spot`;
     const token = await AsyncStorage.getItem("token");
 
     const opts = {

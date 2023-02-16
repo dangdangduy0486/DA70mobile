@@ -1,26 +1,34 @@
-import React from "react";
-import { StyleSheet, Text, View, Image, FlatList } from "react-native";
-
+import { ScrollView, StyleSheet, Text, View, FlatList } from "react-native";
+import React, { useState, useEffect } from "react";
+import * as Animatable from "react-native-animatable";
 import { useGetTransactionsQuery } from "../../features/coins/coinsApiSlice";
 import Loading from "../../pages/Loading/Loading";
 import { COLORS } from "../../color/Color";
+import ListTransactions from "./ListTransactions";
 
 const Transactions = () => {
   const { data } = useGetTransactionsQuery();
 
   if (!data) return <Loading />;
-  //   console.log(data.transaction);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.titleWrapper}>
-        <Text style={styles.title}>Transactions</Text>
-      </View>
-      <View style={styles.divider} />
+    <View style={{ flex: 1, backgroundColor: "black" }}>
       <FlatList
+        keyExtractor={(item) => item.id}
         data={data.transaction}
-        keyExtractor={(item) => item._id}
-        renderItem={RenderItem}
+        renderItem={({ item }) => (
+          <Animatable.View animation="slideInDown" duration={1000} delay={300}>
+            <ListTransactions
+              sender={item.senderAddress}
+              reciever={item.recieverAddress}
+              fiat={item.secondUnit}
+              crypto={item.firstUnit}
+              amount={item.amount}
+              total={item.total}
+              date={item.date}
+            />
+          </Animatable.View>
+        )}
       />
     </View>
   );

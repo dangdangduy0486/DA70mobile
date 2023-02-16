@@ -7,53 +7,6 @@ import * as Animatable from "react-native-animatable";
 import { useGetUserFundingRequestQuery } from "../../features/user/userApiSlice";
 import Loading from "../../pages/Loading/Loading";
 const RequestFunding = ({ navigation }) => {
-  const ListFundings = [
-    {
-      id: 1,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      wallet: "Fiat and spot",
-      creditCard: "JCB",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      wallet: "Fiat and spot",
-      creditCard: "JCB",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      wallet: "Fiat and spot",
-      creditCard: "JCB",
-      status: "Pending",
-    },
-    {
-      id: 4,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      wallet: "Fiat and spot",
-      creditCard: "JCB",
-      status: "Pending",
-    },
-    {
-      id: 5,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      wallet: "Fiat and spot",
-      creditCard: "JCB",
-      status: "Pending",
-    },
-  ];
   const { data } = useGetUserFundingRequestQuery();
   if (!data) return <Loading />;
 
@@ -71,6 +24,7 @@ const RequestFunding = ({ navigation }) => {
               amount={item.amount}
               creditCard={item.senderAddress}
               status={item.status}
+              date={item.date}
               onPress={() => {
                 alert("hihi");
               }}

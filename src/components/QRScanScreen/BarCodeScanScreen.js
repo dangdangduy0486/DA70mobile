@@ -7,13 +7,17 @@ import {
   TouchableOpacity,
   Text,
   View,
+  Alert,
 } from "react-native";
 import { Formik } from "formik";
 import { BarCodeScanner, BarCodeScannerResult } from "expo-barcode-scanner";
 import BarcodeMask from "react-native-barcode-mask";
-
+import { useLoginMutation } from "../../features/auth/authApiSlice";
 import { COLORS } from "../../color/Color";
-import { SceneMap } from "react-native-tab-view";
+import Toast from "react-native-toast-message";
+import { setCredentials } from "../../features/auth/authSlice";
+import { useDispatch } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const finderWidth = 280;
 const finderHeight = 230;
@@ -33,11 +37,6 @@ export default function BarCodeScanScreen() {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
     })();
-
-    if (scanned === true) {
-      console.log("hello")
-      Login();
-    }
   }, []);
   const handleBarCodeScanned = (scanningResult = BarCodeScannerResult) => {
     if (!scanned) {
@@ -52,18 +51,56 @@ export default function BarCodeScanScreen() {
       ) {
         setScanned(true);
         setUserInfo(JSON.parse(data));
+        Alert.alert(
+          "QRCode detected",
+          "Do you like to run the QRCode?",
+          [
+            { text: "No", onPress: Login(JSON.parse(data)) },
+            { text: "Yes", onPress: Login(JSON.parse(data)) },
+          ],
+          { cancelable: false }
+        );
       }
     }
   };
+  const Login = async ({ value, navigation }) => {
+    const [login] = useLoginMutation();
+    const dispatch = useDispatch();
 
-  // const handleFlipCam = () => {
-  //   console.log("pressed");
-  //   setType(
-  //     type === BarCodeScanner.Constants.Type.back
-  //       ? BarCodeScanner.Constants.Type.front
-  //       : BarCodeScanner.Constants.Type.back
-  //   );
-  // };
+    console.log("data", value);
+    const { email, password } = value;
+    // console.log(value.email);
+    // console.log(value.password);
+    console.log(email);
+    // try {
+    //   const { accessToken } = await login({ email, password }).unwrap();
+    //   await dispatch(setCredentials({ accessToken }));
+    //   await AsyncStorage.setItem("token", accessToken);
+    //   Toast.show({
+    //     type: "success",
+    //     text1: "Login success",
+    //   });
+    //   navigation.navigate("DBCoin");
+    // } catch (error) {
+    //   Toast.show({
+    //     type: "error",
+    //     text1: `${error.response.data.message}`,
+    //   });
+    // }
+    // await axios
+    //   .post("http://192.168.7.59:5000/api/auth/login", {
+    //     email: email,
+    //     password: password,
+    //   })
+    //   .then(async (response) => {
+    //     await dispatch(setCredentials({ accessToken }));
+    //     await AsyncStorage.setItem("token", accessToken);
+    //     console.log(response);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+  };
 
   if (hasPermission === null) {
     return <Text>Requesting for camera permission</Text>;
@@ -86,21 +123,7 @@ export default function BarCodeScanScreen() {
             backgroundColor: "transparent",
             flexDirection: "row",
           }}
-        >
-          {/* <TouchableOpacity
-            style={{
-              flex: 1,
-              alignItems: "flex-end",
-            }}
-          >
-            <Text
-              style={{ fontSize: 20, margin: 40, color: "white" }}
-              onPress={handleFlipCam}
-            >
-              Flip
-            </Text>
-          </TouchableOpacity> */}
-        </View>
+        ></View>
         <BarcodeMask edgeColor="#62B1F6" showAnimatedLine />
         {scanned && (
           <Button
@@ -113,76 +136,7 @@ export default function BarCodeScanScreen() {
     </View>
   );
 }
-const Login = (data) => {
-  // console.log(data);
-  // const onSubmit = async (data) => {
-  //   const { email, password } = data;
-  //   console.log(email);
-  //   console.log(password);
-  // try {
-  //   axios
-  //     .post("http://192.168.1.2:5000/api/auth/login", {
-  //       email,
-  //       password,
-  //     })
-  //     .then((response) => {
-  //       console.log(response.data.accessToken);
-  //       AsyncStorage.setItem("token", response.data.accessToken);
-  //       navigation.navigate("DBCoin");
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //   console.log(AsyncStorage.getItem("token"));
-  // } catch (error) {
-  //   console.log(error);
-  // }
-  // };
-  return (
-    <>
-      <View style={styles.header}>
-        <Text style={{ color: "white", fontSize: 20, paddingBottom: 10 }}>
-          Welcome to DBcryto!
-        </Text>
-        <Text style={styles.text_header}>Login</Text>
-      </View>
-      {/* <View style={styles.main}>
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => onSubmit(values)}
-          // {(values) => {
-          //   setTimeout(() => {
-          //     navigation.navigate("DBCoin");
-          //   }, 3000);
-          //   console.log(values);
-          // }}
-        >
-          {({ handleSubmit, values, errors }) => (
-            <View>
-              <ErrorMessage errorValue={errors.password} />
-              <View style={styles.button}>
-                <TouchableOpacity
-                  style={{
-                    width: "100%",
-                    height: 50,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    borderRadius: 10,
-                  }}
-                  onPress={handleSubmit}
-                >
-                  <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                    Login
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        </Formik>
-      </View> */}
-    </>
-  );
-};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

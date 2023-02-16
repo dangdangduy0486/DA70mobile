@@ -3,8 +3,10 @@ import React from "react";
 import { COLORS } from "../../color/Color";
 import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
 import moment from "moment/moment";
-const ListBuy = ({
+
+const ListTransactions = ({
   sender,
+  reciever,
   fiat,
   crypto,
   total,
@@ -19,40 +21,34 @@ const ListBuy = ({
         {/* left */}
         <View style={styles.left}>
           <View style={styles.titleWrapper}>
-            <CryptoSymbol ids={crypto} />
-            <Text style={styles.text}>
-              Sender:
-              {sender.length < 35
-                ? `${sender}`
-                : `${sender.substring(0, 25)}...`}
-            </Text>
-            <Text style={styles.text}>Amount: {amount}</Text>
-            <Text style={styles.text}>
-              Total :{total} {fiat}
-            </Text>
-            <Text style={styles.text}>Date: {moment(date).fromNow()}</Text>
+            <View style={styles.titleWrapper}>
+              <CryptoSymbol ids={crypto} />
+              <Text style={styles.text}>
+                Sender:
+                {sender.length < 35
+                  ? `${sender}`
+                  : `${sender.substring(0, 40)}...`}
+              </Text>
+              <Text style={styles.text}>
+                Reciever:
+                {reciever.length < 35
+                  ? `${reciever}`
+                  : `${reciever.substring(0, 40)}...`}
+              </Text>
+              <Text style={styles.text}>Amount : {amount}</Text>
+              <Text style={styles.text}>
+                Total :{total} {fiat}
+              </Text>
+              <Text style={styles.text}>Date: {moment(date).fromNow()}</Text>
+            </View>
           </View>
-        </View>
-        {/* right */}
-        <View style={styles.right}>
-          <TouchableOpacity
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              backgroundColor: COLORS.yellow1,
-              borderRadius: 7,
-            }}
-            onPress={onPress}
-          >
-            <Text style={{ fontWeight: "bold" }}>Buy</Text>
-          </TouchableOpacity>
         </View>
       </View>
     </View>
   );
 };
 
-export default ListBuy;
+export default ListTransactions;
 
 const styles = StyleSheet.create({
   coinWrapper: {
@@ -76,8 +72,5 @@ const styles = StyleSheet.create({
   title: {
     color: "white",
     fontSize: 19,
-  },
-  right: {
-    justifyContent: "center",
   },
 });
