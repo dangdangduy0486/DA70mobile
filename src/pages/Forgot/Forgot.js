@@ -37,7 +37,6 @@ const Forgot = ({ navigation }) => {
         <Formik
           initialValues={{ email: "" }}
           onSubmit={(values) => {
-            console.log(values);
             navigation.navigate("reset");
           }}
         >

@@ -13,7 +13,6 @@ import BackAction from "../BackAction/BackAction";
 import Wallet from "../../pages/Wallet/Wallet";
 import Overview from "../Overview/Overview";
 import Funding from "../../pages/Funding/Funding";
-// import Funding from "../Funding/Funding";
 import PtoP from "../../pages/P2P/PtoP";
 import AcceptBuy from "../BuyPtoP/AcceptBuy";
 import AcceptSell from "../SellPtoP/AcceptSell";
@@ -27,6 +26,7 @@ import Exchange from "../../pages/Exchange/Exchange";
 import Exchanges from "../Exchanges/Exchanges";
 import Derivatives from "../Exchanges/Derivatives";
 import Transactions from "../Transactions/Transactions";
+import Tabs from "./Tabs";
 const Stack = createNativeStackNavigator();
 const StackNavigation = () => {
   return (
@@ -35,6 +35,11 @@ const StackNavigation = () => {
         options={{ headerShown: false }}
         name="Home"
         component={DrawerNavigation}
+      />
+      <Stack.Screen
+        options={{ headerShown: false }}
+        name="DBCoin"
+        component={Tabs}
       />
       <Stack.Screen
         options={{ headerShown: false }}

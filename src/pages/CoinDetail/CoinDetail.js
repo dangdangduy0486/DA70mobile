@@ -19,36 +19,14 @@ import { COLORS } from "../../color/Color";
 import { useGetCoinInfoDetailsQuery } from "../../features/coins/coinsApiSlice";
 const CoinDetail = ({ navigation }) => {
   const regex = /(<([^>]+)>)/gi;
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [isError, setIsError] = useState(false);
-  // const [coinInfo, setCoinInfo] = useState([]);
-  // const [bao, setBao] = useState([]);
   const route = useRoute();
   const { id } = route.params;
-
-  // useEffect(() => {
-  //   axios
-  //     .get(`https://api.coingecko.com/api/v3/coins/${id}`, {
-  //       params: {
-  //         id: id,
-  //       },
-  //     })
-  //     .then((response) => {
-  //       setCoinInfo(response.data);
-  //       setIsLoading(false);
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       setIsError(true);
-  //     });
-  // }, [id]);
 
   const { data } = useGetCoinInfoDetailsQuery({
     ids: id,
   });
 
   if (!data) return <Loading />;
-  // console.log(data);
   function trading() {
     return (
       <View style={styles.container_detail}>

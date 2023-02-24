@@ -6,7 +6,8 @@ import { COLORS } from "../../color/Color";
 import BuyPtoP from "../../components/BuyPtoP/BuyPtoP";
 import SellPtoP from "../../components/SellPtoP/SellPtoP";
 import CreatePtoP from "../../components/CreatePtoP/CreatePtoP";
-import AcceptBuy from "../../components/BuyPtoP/AcceptBuy";
+import OwnRequest from "../../components/OwnRequest/OwnRequest";
+
 const Tab = createMaterialTopTabNavigator();
 const PtoP = ({ navigation }) => {
   return (
@@ -24,6 +25,7 @@ const PtoP = ({ navigation }) => {
         <Tab.Screen name="Buy" component={BuyPtoP} />
         <Tab.Screen name="Sell" component={SellPtoP} />
         <Tab.Screen name="Post" component={CreatePtoP} />
+        <Tab.Screen name="My Request" component={OwnRequest} />
       </Tab.Navigator>
     </SafeAreaView>
   );

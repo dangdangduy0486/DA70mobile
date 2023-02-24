@@ -99,7 +99,7 @@ const Overview = () => {
               justifyContent: "space-between",
               marginBottom: 16,
             }}
-            onPress={() => navigation.navigate("Funding")}
+            onPress={() => navigation.navigate("Crypto")}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <MaterialCommunityIcons
@@ -107,26 +107,7 @@ const Overview = () => {
                 size={30}
                 style={{ color: COLORS.yellow1, paddingRight: 5 }}
               />
-              <Text style={{ color: COLORS.textColor }}>Funding</Text>
-            </View>
-            <Text style={{ color: COLORS.textColor }}>0.00BTC</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 16,
-            }}
-            onPress={() => navigation.navigate("Futures")}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <MaterialCommunityIcons
-                name="chart-timeline-variant"
-                size={30}
-                style={{ color: COLORS.yellow1, paddingRight: 5 }}
-              />
-              <Text style={{ color: COLORS.textColor }}>Futures</Text>
+              <Text style={{ color: COLORS.textColor }}>Crypto</Text>
             </View>
             <Text style={{ color: COLORS.textColor }}>0.00BTC</Text>
           </TouchableOpacity>

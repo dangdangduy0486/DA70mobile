@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, RefreshControl } from "react-native";
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "../../pages/Home/Home";
@@ -8,8 +8,22 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { COLORS } from "../../color/Color";
 import Wallet from "../../pages/Wallet/Wallet";
 import StackNavigation from "./StackNavigation";
+import { useEffect } from "react";
 const Tab = createBottomTabNavigator();
 const Tabs = () => {
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
+
+  useEffect(() => {
+    onRefresh();
+  });
+
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -21,6 +35,9 @@ const Tabs = () => {
           height: 100,
         },
       }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       <Tab.Screen
         name="Home1"

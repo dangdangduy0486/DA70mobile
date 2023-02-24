@@ -13,7 +13,6 @@ const Derivatives = () => {
     page: page,
   });
   if (!data) return <Loading />;
-  console.log(data);
   return (
     <View style={styles.container}>
       <View style={styles.titleWrapper}>

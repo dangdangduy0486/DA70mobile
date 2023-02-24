@@ -4,7 +4,6 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 import { COLORS } from "../../color/Color";
 import UserAdmin from "../../components/UserAdmin/UserAdmin";
 import RequestAdmin from "../../components/RequestAdmin/RequestAdmin";
-import TransactionAdmin from "../../components/TransactionAdmin/TransactionAdmin";
 const Tab = createMaterialTopTabNavigator();
 const AdminPage = ({ navigation }) => {
   return (
@@ -22,7 +21,6 @@ const AdminPage = ({ navigation }) => {
       >
         <Tab.Screen name="Users" component={UserAdmin} />
         <Tab.Screen name="Requests" component={RequestAdmin} />
-        <Tab.Screen name="History" component={TransactionAdmin} />
       </Tab.Navigator>
     </SafeAreaView>
   );

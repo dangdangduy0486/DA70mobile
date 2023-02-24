@@ -10,19 +10,64 @@ import React, { useState } from "react";
 import BackAction from "../BackAction/BackAction";
 import { COLORS } from "../../color/Color";
 import { useRoute } from "@react-navigation/native";
+import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
+import { usePost2P2ClientRequestMutation } from "../../features/user/userApiSlice";
+import useAuth from "../../hooks/useAuth";
+import Toast from "react-native-toast-message";
+
 const AcceptBuy = ({ navigation }) => {
   const route = useRoute();
-  const [amount1, setAmount1] = useState("");
-  const [inVal, setInVal] = useState(70);
-  const { id, currency, amount, price } = route.params;
+  const [wantedAmount, setWantedAmount] = useState(0);
+  const { id, sender, fiat, crypto, amount, total } = route.params;
+  const [post2P2ClientRequest] = usePost2P2ClientRequestMutation();
 
-  const handleSubmit = () => {
-    console.log(amount1);
-    setAmount1("");
-    if (amount1 < inVal) {
-      alert("Please check your wallet balance");
-    } else {
-      alert("Your transaction is being checked");
+  const handleSubmit = async () => {
+    const { email } = await useAuth();
+    if (amount < wantedAmount) {
+      setWantedAmount(0);
+      Toast.show({
+        type: "error",
+        text1: `Your amount must be lower than ${amount}!!`,
+      });
+      return;
+    } else if (wantedAmount === 0 || !wantedAmount) {
+      setWantedAmount(0);
+      Toast.show({
+        type: "error",
+        text1: `Please enter your desired amount`,
+      });
+      return;
+    }
+
+    try {
+      await post2P2ClientRequest({
+        requestType: "p2pReq",
+        type: "buy",
+        firstUnit: crypto,
+        secondUnit: fiat,
+        amount: wantedAmount,
+        total: (total / amount) * wantedAmount,
+        recieverAddress: sender,
+        senderAddress: email,
+        requestOf: id,
+      }).unwrap();
+      setWantedAmount(0);
+      Toast.show({
+        type: "success",
+        text1: "Your request has been sent",
+      });
+      setTimeout(() => {
+        navigation.navigate("Ptop");
+      }, 2000);
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
     }
   };
   return (
@@ -35,7 +80,8 @@ const AcceptBuy = ({ navigation }) => {
         }}
       >
         <View style={styles.header}>
-          <Text style={styles.text_header}>Buy {currency}</Text>
+          <Text style={styles.text_header}>Buy {crypto}</Text>
+          <CryptoSymbol ids={crypto} />
         </View>
 
         <View style={styles.main}>
@@ -49,20 +95,25 @@ const AcceptBuy = ({ navigation }) => {
                   paddingBottom: 10,
                 }}
               >
-                <Text>Price : {price}</Text>
                 <Text>
-                  Limit : {amount} {currency}
+                  Price : {total / amount} {fiat}
                 </Text>
-                <Text>Available : {inVal}</Text>
+                <Text>Limit : {amount}</Text>
               </View>
               <Text style={styles.form_label_text}>Enter your amount</Text>
               <View style={styles.form_group}>
                 <TextInput
                   placeholder="Enter your amount"
-                  onChangeText={(newText) => setAmount1(newText)}
-                  defaultValue={amount1}
+                  onChangeText={(newText) => setWantedAmount(newText)}
+                  defaultValue={amount}
                   style={styles.form_input}
+                  keyboardType="numeric"
                 />
+              </View>
+              <View style={styles.form_group}>
+                <Text>
+                  Total: {(total / amount) * wantedAmount} -{fiat}
+                </Text>
               </View>
               <View style={styles.button}>
                 <TouchableOpacity

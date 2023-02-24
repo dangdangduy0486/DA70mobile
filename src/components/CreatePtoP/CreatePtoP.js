@@ -14,11 +14,15 @@ import React, { useState, useEffect } from "react";
 import { SelectList } from "react-native-dropdown-select-list";
 
 import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
-import { useGetUserWalletQuery } from "../../features/user/userApiSlice";
+import {
+  useGetUserWalletQuery,
+  usePost2P2RequestMutation,
+} from "../../features/user/userApiSlice";
 import { COLORS } from "../../color/Color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAuth from "../../hooks/useAuth";
 import { Toast } from "react-native-toast-message/lib/src/Toast";
+import Loading from "../../pages/Loading/Loading";
 const CreatePtoP = ({ navigation }) => {
   const method = [
     { key: "buy", value: "Buy" },
@@ -59,56 +63,37 @@ const CreatePtoP = ({ navigation }) => {
     { key: "dogecoin", value: "Dogecoin" },
   ];
 
+  const [post2P2Request] = usePost2P2RequestMutation();
   const handleSubmit = async () => {
-    console.log("hello");
-    const token = await AsyncStorage.getItem("token");
-    const opts = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    };
-    // if (price > highRate[currencyID] || price < lowRate[currencyID]) {
-    //   Toast.show({
-    //     type: "error",
-    //     text1: "Please pre-check your price",
-    //   });
-    //   return;
-    // }
-    //  else if (amount <= 0) {
-    //   Toast.show({
-    //     type: "error",
-    //     text1: "Please pre-check your amount",
-    //   });
-    //   return;
-    // }
-    axios
-      .post(
-        `http://172.16.1.27:5000/api/user/request-p2p/create`,
-        {
-          type: methodSelected,
-          firstUnit: selectedCrypto,
-          secondUnit: currencyID,
-          total: price * amount,
-          amount: amount,
-        },
-        opts
-      )
-      .then((response) => {
-        Toast.show({
-          type: "success",
-          text1: response.data.message,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
+    const { email } = await useAuth();
+    try {
+      await post2P2Request({
+        type: methodSelected,
+        firstUnit: selectedCrypto,
+        secondUnit: currencyID,
+        total: price * amount,
+        amount: amount,
+        senderAddress: email,
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Your request has been sent",
+      });
+      setTimeout(() => {
+        navigation.navigate("Ptop");
+      }, 2000);
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
         Toast.show({
           type: "error",
-          text1: error.response.data.message,
+          text1: error.data.message,
         });
-      });
-    console.log("hel1lo");
+      }
+    }
   };
-  if (!data) return null;
+  if (!data) return <Loading />;
   function isFiat(value) {
     return value.type === "Fiat Currencies";
   }

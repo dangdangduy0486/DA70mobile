@@ -1,20 +1,15 @@
 import { View, Text, SafeAreaView, TouchableOpacity } from "react-native";
 import React from "react";
 import { StyleSheet } from "react-native";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-import { useNavigation } from "@react-navigation/native";
-
 import Overview from "../../components/Overview/Overview";
-import Funding from "../../components/Funding/Funding";
-import Futures from "../../components/Futures/Futures";
 import Fiat from "../../components/Fiat/Fiat";
 import { COLORS } from "../../color/Color";
 import { useGetUserQuery } from "../../features/user/userApiSlice";
+import Crypto from "../../components/Crypto/Crypto";
 
 const Tab = createMaterialTopTabNavigator();
 const Wallet = ({ navigation }) => {
-  // const navigation = useNavigation();
   const { data: userInfo } = useGetUserQuery();
 
   return (
@@ -32,7 +27,7 @@ const Wallet = ({ navigation }) => {
           >
             <Tab.Screen name="Overview" component={Overview} />
             <Tab.Screen name="Fiat" component={Fiat} />
-            <Tab.Screen name="Funding" component={Funding} />
+            <Tab.Screen name="Crypto" component={Crypto} />
           </Tab.Navigator>
         </>
       ) : (

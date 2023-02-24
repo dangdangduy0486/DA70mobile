@@ -1,24 +1,40 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React, { useState } from "react";
+import React from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import { COLORS } from "../../color/Color";
-import moment from "moment/moment";
 import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";
-import { usePatchAdminResponseMutation } from "../../features/user/userApiSlice";
+import moment from "moment/moment";
+import { usePatch2P2ResponseMutation } from "../../features/user/userApiSlice";
 import Toast from "react-native-toast-message";
 
-const ListSpot = ({ id, name, amount, total, crypto, fiat, status, date }) => {
-  const [patchAdminResponse] = usePatchAdminResponseMutation();
+const OwnRequestList = ({
+  sender,
+  fiat,
+  crypto,
+  total,
+  amount,
+  date,
+  status,
+  id,
+}) => {
+  const [patch2P2Response] = usePatch2P2ResponseMutation();
 
-  const handleResponseApproved = async () => {
+  const handleReject = async () => {
+    console.log("hello");
+    console.log(id);
     try {
-      await patchAdminResponse({
-        type: "spot",
+      await patch2P2Response({
         requestID: id,
-        status: "approved",
+        status: "rejected",
       }).unwrap();
       Toast.show({
         type: "success",
-        text1: "Approved",
+        text1: "Rejected",
       });
     } catch (error) {
       if (error.status === 500) {
@@ -31,17 +47,15 @@ const ListSpot = ({ id, name, amount, total, crypto, fiat, status, date }) => {
       }
     }
   };
-
-  const handleResponseDenided = async () => {
+  const handleApprove = async () => {
     try {
-      await patchAdminResponse({
-        type: "spot",
+      await patch2P2Response({
         requestID: id,
-        status: "rejected",
+        status: "approved",
       }).unwrap();
       Toast.show({
         type: "success",
-        text1: "Rejected",
+        text1: "Approved",
       });
     } catch (error) {
       if (error.status === 500) {
@@ -62,28 +76,17 @@ const ListSpot = ({ id, name, amount, total, crypto, fiat, status, date }) => {
           <View style={styles.titleWrapper}>
             <CryptoSymbol ids={crypto} />
             <Text style={styles.text}>
-              Name:
-              {name.length < 35 ? `${name}` : `${name.substring(0, 25)}...`}
+              By:
+              {sender.length < 35
+                ? `${sender}`
+                : `${sender.substring(0, 25)}...`}
             </Text>
-            <Text style={styles.text}>Amount : {amount}</Text>
+            <Text style={styles.text}>Amount: {amount}</Text>
             <Text style={styles.text}>
-              Total: {total} {fiat}
+              Total :{total} {fiat}
             </Text>
-            <Text style={styles.text}>Date : {moment(date).fromNow()}</Text>
+            <Text style={styles.text}>Date: {moment(date).fromNow()}</Text>
           </View>
-        </View>
-        {/* center */}
-        <View style={styles.center}>
-          <Text
-            style={{
-              width: 20,
-              height: 20,
-              borderRadius: 10,
-              borderWidth: 1,
-              overflow: "hidden",
-              borderColor: "black",
-            }}
-          ></Text>
         </View>
         {/* right */}
         <View style={styles.right}>
@@ -101,20 +104,20 @@ const ListSpot = ({ id, name, amount, total, crypto, fiat, status, date }) => {
                   paddingHorizontal: 20,
                   backgroundColor: COLORS.yellow1,
                   borderRadius: 7,
-                  marginBottom: 5,
                 }}
-                onPress={handleResponseApproved}
+                onPress={handleApprove}
               >
                 <Text style={{ fontWeight: "bold" }}>Approve</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
+                  marginTop: 10,
                   paddingVertical: 10,
                   paddingHorizontal: 20,
                   backgroundColor: COLORS.yellow1,
                   borderRadius: 7,
                 }}
-                onPress={handleResponseDenided}
+                onPress={handleReject}
               >
                 <Text style={{ fontWeight: "bold" }}>Reject</Text>
               </TouchableOpacity>
@@ -126,7 +129,7 @@ const ListSpot = ({ id, name, amount, total, crypto, fiat, status, date }) => {
   );
 };
 
-export default ListSpot;
+export default OwnRequestList;
 
 const styles = StyleSheet.create({
   coinWrapper: {
@@ -152,9 +155,6 @@ const styles = StyleSheet.create({
     fontSize: 19,
   },
   right: {
-    justifyContent: "center",
-  },
-  center: {
     justifyContent: "center",
   },
 });

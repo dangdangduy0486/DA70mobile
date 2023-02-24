@@ -1,4 +1,10 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  TextInput,
+} from "react-native";
 import React from "react";
 import { COLORS } from "../../color/Color";
 import CryptoSymbol from "../CryptoSymbol/CryptoSymbol";

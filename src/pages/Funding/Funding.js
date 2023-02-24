@@ -9,18 +9,17 @@ import {
   Image,
 } from "react-native";
 import React, { useState } from "react";
-import * as Yup from "yup";
-import { Formik } from "formik";
 import { SafeAreaView } from "react-native-safe-area-context";
 import BackAction from "../../components/BackAction/BackAction";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { COLORS } from "../../color/Color";
 import { SelectList } from "react-native-dropdown-select-list";
+import { useGetCurrenciesQuery } from "../../features/coins/coinsApiSlice";
+import { usePostClientRequestMutation } from "../../features/user/userApiSlice";
+import Toast from "react-native-toast-message";
+import Loading from "../Loading/Loading";
+import useAuth from "../../hooks/useAuth";
+
 const Funding = ({ navigation }) => {
-  const walletList = ["Fiat and spot", "Futures", "Funding"];
-  const currencyList = ["VND", "YRN", "USD", "YRN", "USD", "YRN", "USD"];
-  const [isFocus, setIsFocus] = useState(false);
-  const [walletChoose, setWalletChoose] = useState("Fiat and spot");
   const [currencyID, setCurrencyID] = useState("USD");
   const [creditcard, setCreditcard] = useState("Mastercard");
   const ListCreditCard = [
@@ -65,14 +64,54 @@ const Funding = ({ navigation }) => {
       value: "American Express",
     },
   ];
-  const [amount, setAmount] = useState(null);
-  const handleSubmit = () => {
-    console.log(amount);
-    console.log(walletChoose);
-    console.log(currencyID);
-    console.log(creditcard);
-    alert("Your transaction is being checked");
+  const [amount, setAmount] = useState(0);
+
+  const { data: fiatCurrencies } = useGetCurrenciesQuery();
+  function isFiat(value) {
+    return (
+      value.category === "Fiat Currencies" ||
+      value.category === "Suggested Currencies"
+    );
+  }
+  const [postClientRequest] = usePostClientRequestMutation();
+  const handleSubmit = async () => {
+    const { email } = await useAuth();
+    try {
+      await postClientRequest({
+        reqType: "funding",
+        firstUnit: currencyID,
+        senderAddress: creditcard,
+        amount: amount,
+        recieverAddress: email,
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Your request has been sent",
+      });
+      setTimeout(() => {
+        navigation.navigate("Overview");
+      }, 2000);
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
+    }
   };
+
+  if (!fiatCurrencies) return <Loading />;
+  var filtered = fiatCurrencies.filter(isFiat);
+  let fiatList = [];
+  filtered.forEach((item) => {
+    fiatList.push({
+      key: item.symbol,
+      value: item.name,
+    });
+  });
   const cardView = () => {
     return ListCreditCard.map((e, index) => {
       return (
@@ -82,7 +121,6 @@ const Funding = ({ navigation }) => {
             margin: 10,
             flexDirection: "row",
             alignItems: "center",
-            // backgroundColor: creditcard === e.value ? COLORS.yellow1 : "white",
           }}
           onPress={() => {
             setCreditcard(e.value);
@@ -92,7 +130,7 @@ const Funding = ({ navigation }) => {
           <Image
             source={{ uri: e.img }}
             resizeMode="cover"
-            style={{ height: 50, width: 50, padding: 10 }}
+            style={{ height: "auto", width: 70, padding: 20 }}
           />
           <Text style={{ fontSize: 13, marginHorizontal: 10 }}>{e.value}</Text>
         </TouchableOpacity>
@@ -125,23 +163,17 @@ const Funding = ({ navigation }) => {
                   onChangeText={(newText) => setAmount(newText)}
                   defaultValue={amount}
                   style={styles.form_input}
+                  keyboardType="numeric"
                 />
               </View>
               <Text style={styles.form_label_text}>Select your currency</Text>
               <View style={styles.form_group1}>
                 <SelectList
                   setSelected={(val) => setCurrencyID(val)}
-                  data={currencyList}
+                  data={fiatList}
                   search={false}
+                  save="key"
                   dropdownStyles={{ maxHeight: 150 }}
-                />
-              </View>
-              <Text style={styles.form_label_text}>Select your wallet</Text>
-              <View style={styles.form_group1}>
-                <SelectList
-                  setSelected={(val) => setWalletChoose(val)}
-                  data={walletList}
-                  search={false}
                 />
               </View>
               <ScrollView

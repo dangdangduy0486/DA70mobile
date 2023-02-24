@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Pressable,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import * as Yup from "yup";
 import React, { useState } from "react";
@@ -58,7 +59,7 @@ const Login = ({ navigation }) => {
         type: "success",
         text1: "Login success",
       });
-      navigation.navigate("DBcoin");
+      onRefresh();
     } catch (error) {
       Toast.show({
         type: "error",
@@ -66,8 +67,22 @@ const Login = ({ navigation }) => {
       });
     }
   };
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      navigation.navigate("DBCoin");
+    }, 2000);
+  }, []);
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
+    <SafeAreaView
+      style={{ flex: 1, backgroundColor: "black" }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <View style={styles.header}>
         <Text style={{ color: "white", fontSize: 20, paddingBottom: 10 }}>
           Welcome to DBcryto!

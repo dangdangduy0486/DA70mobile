@@ -9,7 +9,6 @@ import Loading from "../../pages/Loading/Loading";
 const SellPtoP = ({ navigation }) => {
   const { data } = useGetP2PSellRequestQuery();
   if (!data) return <Loading />;
-  console.log(data.request);
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
       <FlatList
@@ -26,10 +25,12 @@ const SellPtoP = ({ navigation }) => {
               date={item.date}
               onPress={() => {
                 navigation.navigate("AcceptSell", {
-                  id: item.id,
-                  currency: item.currency,
+                  id: item._id,
+                  sender: item.senderAddress,
+                  fiat: item.secondUnit,
+                  crypto: item.firstUnit,
                   amount: item.amount,
-                  price: item.price,
+                  total: item.total,
                 });
               }}
             />

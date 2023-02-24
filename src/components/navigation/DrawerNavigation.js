@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Image,
   ImageBackground,
+  RefreshControl,
 } from "react-native";
 import React from "react";
 import {
@@ -35,7 +36,6 @@ import Derivatives from "../Exchanges/Derivatives";
 import { useSendLogoutMutation } from "../../features/auth/authApiSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/native";
-import RNRestart from "react-native-restart";
 
 const Drawer = createDrawerNavigator();
 const User = () => {
@@ -57,6 +57,9 @@ const User = () => {
           borderRadius: 30,
           borderColor: "black",
           borderWidth: 3,
+        }}
+        source={{
+          uri: `${data.user.image ? data.user.image : ""}`,
         }}
       />
       <Text style={{ fontSize: 16, fontWeight: "bold", paddingVertical: 5 }}>
@@ -85,15 +88,27 @@ const CustomDrawer = (props) => {
   const navigation = useNavigation();
   const { data } = useGetUserQuery();
   const [sendLogout] = useSendLogoutMutation();
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem("token");
     await sendLogout;
-    // RNRestart.Restart();
-    navigation.navigate("Market");
+    await onRefresh();
   };
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+      navigation.navigate("DBCoin");
+    }, 2000);
+  }, []);
   return (
-    <View style={{ flex: 1 }}>
+    <View
+      style={{ flex: 1 }}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {data ? <User /> : <Guest />}
       <DrawerContentScrollView>
         <DrawerItemList {...props} />
@@ -119,7 +134,14 @@ const CustomDrawer = (props) => {
 
 const DrawerNavigation = () => {
   const { data } = useGetUserQuery();
-  // if (!data) return <Loading />;
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }, []);
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -131,6 +153,9 @@ const DrawerNavigation = () => {
         swipeEdgeWidth: Dimensions.get("window").width / 2,
       }}
       drawerContent={(props) => <CustomDrawer {...props} />}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
     >
       {!data ? (
         <>

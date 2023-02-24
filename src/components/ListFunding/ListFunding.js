@@ -2,20 +2,70 @@ import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { COLORS } from "../../color/Color";
 import moment from "moment/moment";
-import formatCurrency from "react-native-format-currency";
+import { usePatchAdminResponseMutation } from "../../features/user/userApiSlice";
+import Toast from "react-native-toast-message";
 
-const ListFunding = ({ name, currency, amount, creditCard, status, date }) => {
-  const [newStatus, setNewStatus] = useState(status);
-  const [approve, setApprove] = useState("");
-  const [reject, setReject] = useState("");
+const ListFunding = ({
+  id,
+  name,
+  currency,
+  amount,
+  creditCard,
+  status,
+  date,
+}) => {
+  const [patchAdminResponse] = usePatchAdminResponseMutation();
+
+  const handleResponseApproved = async () => {
+    try {
+      await patchAdminResponse({
+        type: "funding",
+        requestID: id,
+        status: "approved",
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Approved",
+      });
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
+    }
+  };
+
+  const handleResponseDenided = async () => {
+    try {
+      await patchAdminResponse({
+        type: "funding",
+        requestID: id,
+        status: "rejected",
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Rejected",
+      });
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
+    }
+  };
   return (
     <View>
       <View style={styles.coinWrapper}>
         {/* left */}
         <View style={styles.left}>
-          <View style={{ marginRight: 10 }}>
-            {/* <Text style={{ color: "white" }}>{id}</Text> */}
-          </View>
           <View style={styles.titleWrapper}>
             <Text style={styles.text}>
               Name:
@@ -35,7 +85,6 @@ const ListFunding = ({ name, currency, amount, creditCard, status, date }) => {
               height: 20,
               borderRadius: 10,
               borderWidth: 1,
-              backgroundColor: status === newStatus ? "red" : "green",
               overflow: "hidden",
               borderColor: "black",
             }}
@@ -43,40 +92,38 @@ const ListFunding = ({ name, currency, amount, creditCard, status, date }) => {
         </View>
         {/* right */}
         <View style={styles.right}>
-          <TouchableOpacity
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              backgroundColor: COLORS.yellow1,
-              borderRadius: 7,
-              //   opacity: approve === "Approve" ? 0 : 1,
-              display: approve === "approved" ? "none" : "flex",
-            }}
-            onPress={() => {
-              setNewStatus("approved");
-              setApprove("approved");
-              setReject("rejected");
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Approve</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              paddingVertical: 10,
-              paddingHorizontal: 20,
-              backgroundColor: COLORS.yellow1,
-              borderRadius: 7,
-              //   opacity: reject === "Reject" ? 0 : 1,
-              display: reject === "rejected" ? "none" : "flex",
-            }}
-            onPress={() => {
-              setNewStatus("pending");
-              setApprove("approved");
-              setReject("rejected");
-            }}
-          >
-            <Text style={{ fontWeight: "bold" }}>Reject</Text>
-          </TouchableOpacity>
+          {status === "approved" || status === "rejected" ? (
+            <Text
+              style={{ color: `${status === "approved" ? "green" : "red"}` }}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Text>
+          ) : (
+            <>
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  backgroundColor: COLORS.yellow1,
+                  borderRadius: 7,
+                }}
+                onPress={handleResponseApproved}
+              >
+                <Text style={{ fontWeight: "bold" }}>Approve</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  backgroundColor: COLORS.yellow1,
+                  borderRadius: 7,
+                }}
+                onPress={handleResponseDenided}
+              >
+                <Text style={{ fontWeight: "bold" }}>Reject</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </View>
     </View>

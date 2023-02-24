@@ -48,7 +48,6 @@ const Home = ({ navigation }) => {
 
   const user = async () => {
     const token = await AsyncStorage.getItem("token");
-    // console.log(token);
     const opts = {
       headers: {
         Authorization: token ? `Bearer ${token}` : "",

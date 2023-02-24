@@ -1,7 +1,32 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import React from "react";
 import { COLORS } from "../../color/Color";
+import { useDeleteUserByAdminMutation } from "../../features/user/userApiSlice";
+import Toast from "react-native-toast-message";
+
 const ListUser = ({ id, name, email, onPress }) => {
+  const [deleteUserByAdmin] = useDeleteUserByAdminMutation();
+
+  const handleDeleteUser = async () => {
+    try {
+      await deleteUserByAdmin({
+        email: email,
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Delete user success!!",
+      });
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
+    }
+  };
   return (
     <View>
       <View style={styles.coinWrapper}>
@@ -26,7 +51,19 @@ const ListUser = ({ id, name, email, onPress }) => {
             }}
             onPress={onPress}
           >
-            <Text style={{ fontWeight: "bold" }}>Detail</Text>
+            <Text style={{ fontWeight: "bold" }}>Edit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              paddingVertical: 10,
+              paddingHorizontal: 20,
+              backgroundColor: "red",
+              borderRadius: 7,
+              marginTop: 10,
+            }}
+            onPress={handleDeleteUser}
+          >
+            <Text style={{ fontWeight: "bold" }}>Delete</Text>
           </TouchableOpacity>
         </View>
       </View>

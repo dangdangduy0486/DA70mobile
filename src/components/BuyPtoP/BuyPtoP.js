@@ -1,15 +1,12 @@
 import { ScrollView, StyleSheet, Text, View, FlatList } from "react-native";
 import React, { useState, useEffect } from "react";
 import * as Animatable from "react-native-animatable";
-import { useRoute } from "@react-navigation/native";
-import { COLORS } from "../../color/Color";
 import ListBuy from "../ListBuyPtoP/ListBuy";
 import { useGetP2PBuyRequestQuery } from "../../features/user/userApiSlice";
 import Loading from "../../pages/Loading/Loading";
 const BuyPtoP = ({ navigation }) => {
-  const { data, isFetching } = useGetP2PBuyRequestQuery();
+  const { data } = useGetP2PBuyRequestQuery();
   if (!data) return <Loading />;
-  console.log(data.request);
 
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
@@ -27,10 +24,12 @@ const BuyPtoP = ({ navigation }) => {
               date={item.date}
               onPress={() => {
                 navigation.navigate("AcceptBuy", {
-                  id: item.id,
-                  currency: item.currency,
+                  id: item._id,
+                  sender: item.senderAddress,
+                  fiat: item.secondUnit,
+                  crypto: item.firstUnit,
                   amount: item.amount,
-                  price: item.price,
+                  total: item.total,
                 });
               }}
             />

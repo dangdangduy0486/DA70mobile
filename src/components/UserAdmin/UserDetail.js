@@ -10,15 +10,36 @@ import React, { useState } from "react";
 import BackAction from "../BackAction/BackAction";
 import { COLORS } from "../../color/Color";
 import { useRoute } from "@react-navigation/native";
+import { usePatchUserByAdminMutation } from "../../features/user/userApiSlice";
+import Toast from "react-native-toast-message";
+
 const UserDetail = ({ navigation }) => {
   const route = useRoute();
-  const [selectedButton, setSelectedButton] = useState("button1");
   const { id, name, email } = route.params;
   const [userName, setUserName] = useState(`${name}`);
-  const [userEmail, setUserEmail] = useState(`${email}`);
-  const handleSubmit = () => {
-    console.log(userName);
-    console.log(userEmail);
+
+  const [patchUserByAdmin] = usePatchUserByAdminMutation();
+
+  const handleSubmit = async () => {
+    try {
+      await patchUserByAdmin({
+        email: email,
+        fullname: userName,
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Edit user success!!",
+      });
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
+    }
   };
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
@@ -42,6 +63,10 @@ const UserDetail = ({ navigation }) => {
                   paddingBottom: 10,
                 }}
               >
+                <Text style={styles.form_label_text}>Email</Text>
+                <View style={styles.form_group}>
+                  <Text style={styles.form_input}>{email}</Text>
+                </View>
                 <Text style={styles.form_label_text}>Name</Text>
                 <View style={styles.form_group}>
                   <TextInput
@@ -49,15 +74,6 @@ const UserDetail = ({ navigation }) => {
                     onChangeText={(newText) => setUserName(newText)}
                     value={userName}
                     defaultValue={name}
-                  ></TextInput>
-                </View>
-                <Text style={styles.form_label_text}>Email</Text>
-                <View style={styles.form_group}>
-                  <TextInput
-                    style={styles.form_input}
-                    onChangeText={(newText) => setUserEmail(newText)}
-                    value={userEmail}
-                    defaultValue={email}
                   ></TextInput>
                 </View>
               </View>

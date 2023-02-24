@@ -55,7 +55,6 @@ const Spot = ({ navigation }) => {
         Authorization: token ? `Bearer ${token}` : "",
       },
     };
-    console.log(opts);
     await axios
       .post(
         url,

@@ -6,43 +6,6 @@ import * as Animatable from "react-native-animatable";
 import { useGetUserSpotRequestQuery } from "../../features/user/userApiSlice";
 import Loading from "../../pages/Loading/Loading";
 const RequestSpot = ({ navigation }) => {
-  const ListFunding = [
-    {
-      id: 1,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      status: "Pending",
-    },
-    {
-      id: 2,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      status: "Pending",
-    },
-    {
-      id: 4,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      status: "Pending",
-    },
-    {
-      id: 5,
-      name: "minhbao",
-      amount: 100,
-      currency: "VND",
-      status: "Pending",
-    },
-  ];
   const { data } = useGetUserSpotRequestQuery();
   if (!data) return <Loading />;
   return (
@@ -54,6 +17,7 @@ const RequestSpot = ({ navigation }) => {
           <Animatable.View animation="slideInDown" duration={1000} delay={300}>
             <ListSpot
               key={item._id}
+              id={item._id}
               name={item.recieverAddress}
               crypto={item.firstUnit}
               fiat={item.secondUnit}
@@ -62,9 +26,6 @@ const RequestSpot = ({ navigation }) => {
               creditCard={item.senderAddress}
               status={item.status}
               date={item.date}
-              onPress={() => {
-                alert("hihi");
-              }}
             />
           </Animatable.View>
         )}

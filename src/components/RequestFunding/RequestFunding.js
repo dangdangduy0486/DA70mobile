@@ -19,15 +19,13 @@ const RequestFunding = ({ navigation }) => {
           <Animatable.View animation="slideInDown" duration={1000} delay={300}>
             <ListFunding
               key={item._id}
+              id={item._id}
               name={item.recieverAddress}
               currency={item.firstUnit}
               amount={item.amount}
               creditCard={item.senderAddress}
               status={item.status}
               date={item.date}
-              onPress={() => {
-                alert("hihi");
-              }}
             />
           </Animatable.View>
         )}

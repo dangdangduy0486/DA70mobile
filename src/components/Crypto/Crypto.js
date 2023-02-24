@@ -1,16 +1,17 @@
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React from "react";
+import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { COLORS } from "../../color/Color";
 import { useGetUserWalletQuery } from "../../features/user/userApiSlice";
 import Loading from "../../pages/Loading/Loading";
+import CryptoSymbol from "../../components/CryptoSymbol/CryptoSymbol";
 
-const Fiat = () => {
-  const { data: fiatCurrencies } = useGetUserWalletQuery();
-  if (!fiatCurrencies) return <Loading />;
-  function isFiat(value) {
-    return value.type === "Fiat Currencies";
+const Crypto = () => {
+  const { data: cryptoCurrencies } = useGetUserWalletQuery();
+  if (!cryptoCurrencies) return <Loading />;
+  function isCrypto(value) {
+    return value.type === "Cryptocurrencies";
   }
-  let fiatList = fiatCurrencies.wallet.filter(isFiat);
+  let cryptoList = cryptoCurrencies.wallet.filter(isCrypto);
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
       <Text style={styles.title}>Wallet Fiat</Text>
@@ -18,7 +19,7 @@ const Fiat = () => {
         <Text style={styles.info}>My Assets</Text>
         <View style={styles.divider} />
         <View>
-          {fiatList.map((currency, index) => (
+          {cryptoList.map((currency, index) => (
             <View
               key={index}
               style={{
@@ -29,6 +30,7 @@ const Fiat = () => {
               }}
             >
               <Text style={{ color: "white" }}>{currency.currencyID}</Text>
+              <CryptoSymbol ids={currency.currencyID} />
               <Text style={{ color: "white" }}>
                 {currency.amount ? currency.amount.toLocaleString() : "?"}
               </Text>
@@ -40,7 +42,7 @@ const Fiat = () => {
   );
 };
 
-export default Fiat;
+export default Crypto;
 
 const styles = StyleSheet.create({
   title: {

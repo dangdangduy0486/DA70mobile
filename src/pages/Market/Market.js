@@ -47,8 +47,6 @@ const Market = ({ navigation }) => {
   }, [data, isLoading]);
 
   if (!markets && !data) return <Loading />;
-  // console.log(data);
-  // console.log(markets);
   return (
     <View style={styles.container}>
       <View style={styles.titleWrapper}>
