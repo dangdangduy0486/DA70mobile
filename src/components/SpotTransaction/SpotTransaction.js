@@ -19,6 +19,9 @@ import { useGetUserWalletQuery } from "../../features/user/userApiSlice";
 import { COLORS } from "../../color/Color";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import useAuth from "../../hooks/useAuth";
+import { usePostClientRequestMutation } from "../../features/user/userApiSlice";
+import Toast from "react-native-toast-message";
+
 const Spot = ({ navigation }) => {
   const [coinInfo, setCoinInfo] = useState([]);
   const route = useRoute();
@@ -45,43 +48,37 @@ const Spot = ({ navigation }) => {
       return amount * data.market_data.current_price[currency].toFixed(5);
     }
   };
+  const [postClientRequest] = usePostClientRequestMutation();
+
   const handleSubmit = async () => {
     const { email } = await useAuth();
-    const url = `http://172.16.1.27:5000/api/user/request/create/spot`;
-    const token = await AsyncStorage.getItem("token");
-
-    const opts = {
-      headers: {
-        Authorization: token ? `Bearer ${token}` : "",
-      },
-    };
-    await axios
-      .post(
-        url,
-        {
-          type: "buy",
-          firstUnit: id ? id : "bitcoin",
-          secondUnit: currency,
-          amount: amount,
-          total: handelAmount(),
-          senderAddress: "DB Crypto",
-          recieverAddress: email,
-        },
-        opts
-      )
-      .then((response) => {
-        console.log(response.data.message);
-      })
-      .catch((error) => {
-        console.log(error);
-        if (!email) {
-          console.log("Please Login");
-          return;
-        }
+    try {
+      await postClientRequest({
+        reqType: "spot",
+        type: "buy",
+        firstUnit: id ? id : "bitcoin",
+        secondUnit: currency,
+        amount: amount,
+        total: handelAmount(),
+        senderAddress: "DB Crypto",
+        recieverAddress: email,
+      }).unwrap();
+      Toast.show({
+        type: "success",
+        text1: "Your request has been sent",
       });
+    } catch (error) {
+      if (error.status === 500) {
+        return null;
+      } else {
+        Toast.show({
+          type: "error",
+          text1: error.data.message,
+        });
+      }
+    }
   };
   if (!data) return <Loading />;
-  console.log(currencies); //..Fiat Currencies
   return (
     <View style={{ flex: 1, backgroundColor: "black" }}>
       <View
