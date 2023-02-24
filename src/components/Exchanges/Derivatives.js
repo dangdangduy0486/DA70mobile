@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, Image, FlatList } from "react-native";
 import { useGetDerivativesDetailsQuery } from "../../features/coins/coinsApiSlice";
 import Loading from "../../pages/Loading/Loading";
 import { COLORS } from "../../color/Color";
+import ListDerivaties from "../ListDerivaties/ListDerivaties";
 const Derivatives = () => {
   const [perPage, setPerPage] = useState(100);
   const [page, setPage] = useState(1);
@@ -20,9 +21,18 @@ const Derivatives = () => {
       </View>
       <View style={styles.divider} />
       <FlatList
-        data={data.transaction}
-        keyExtractor={(item) => item._id}
-        renderItem={RenderItem}
+        scrollIndicatorInsets={{ right: 1 }}
+        data={data}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <ListDerivaties
+            urlImage={item.image}
+            name={item.name}
+            trade_volume_24h_btc={item.trade_volume_24h_btc}
+            open_interest_btc={item.open_interest_btc}
+            number_of_perpetual_pairs={item.number_of_perpetual_pairs}
+          />
+        )}
       />
     </View>
   );

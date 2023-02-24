@@ -1,4 +1,11 @@
-import { ScrollView, StyleSheet, Text, View, FlatList } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  SafeAreaView,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import * as Animatable from "react-native-animatable";
 import { useGetTransactionsQuery } from "../../features/coins/coinsApiSlice";
@@ -12,7 +19,7 @@ const Transactions = () => {
   if (!data) return <Loading />;
 
   return (
-    <View style={{ flex: 1, backgroundColor: "black" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "black" }}>
       <FlatList
         keyExtractor={(item) => item.id}
         data={data.transaction}
@@ -30,7 +37,7 @@ const Transactions = () => {
           </Animatable.View>
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

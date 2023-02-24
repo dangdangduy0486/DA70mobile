@@ -33,12 +33,11 @@ const Wallet = ({ navigation }) => {
             <Tab.Screen name="Overview" component={Overview} />
             <Tab.Screen name="Fiat" component={Fiat} />
             <Tab.Screen name="Funding" component={Funding} />
-            <Tab.Screen name="Futures" component={Futures} />
           </Tab.Navigator>
         </>
       ) : (
         <>
-          <Text>LPlease Login !!</Text>
+          <Text>Please Login !!</Text>
           <TouchableOpacity
             onPress={() => navigation.navigate("Login")}
             style={walletCss.appButtonContainer}

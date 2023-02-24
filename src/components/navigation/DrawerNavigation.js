@@ -136,6 +136,11 @@ const DrawerNavigation = () => {
         <>
           <Drawer.Screen
             options={{ headerShown: false }}
+            name="DBCoin"
+            component={Tabs}
+          />
+          <Drawer.Screen
+            options={{ headerShown: false }}
             name="Login"
             component={Login}
           />

@@ -58,7 +58,7 @@ const Login = ({ navigation }) => {
         type: "success",
         text1: "Login success",
       });
-      navigation.navigate("DBCoin");
+      navigation.navigate("DBcoin");
     } catch (error) {
       Toast.show({
         type: "error",

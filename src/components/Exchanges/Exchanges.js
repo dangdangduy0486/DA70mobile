@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Image, FlatList } from "react-native";
 
 import { useGetExchangesDetailsQuery } from "../../features/coins/coinsApiSlice";
 import Loading from "../../pages/Loading/Loading";
+import ListExchanges from "../ListExchanges/ListExchanges";
 import { COLORS } from "../../color/Color";
 const Exchanges = () => {
   const [perPage, setPerPage] = useState(100);
@@ -20,10 +21,18 @@ const Exchanges = () => {
       </View>
       <View style={styles.divider} />
       <FlatList
-        data={data.transaction}
-        keyExtractor={(item) => item._id}
-        renderItem={RenderItem}
-        Exchanges
+        data={data}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <ListExchanges
+            urlImage={item.image}
+            name={item.name}
+            trade_volume_24h_btc_normalized={
+              item.trade_volume_24h_btc_normalized
+            }
+            trade_volume_24h_btc={item.trade_volume_24h_btc}
+          />
+        )}
       />
     </View>
   );

@@ -36,8 +36,6 @@ const Exchange = ({ navigation }) => {
             component={SpotTransaction}
             initialParams={{ id: "bitcoin" }}
           />
-
-          <Tab.Screen name="Futures" component={FutureTransaction} />
         </Tab.Navigator>
       </View>
     </View>
